@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Görsel Yükleme";
+}
+
+<h2>Görsel Yükleme</h2>
+
+<!-- Dosya Yükleme Formu -->
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" class="form-control mb-3" />
+</form>
+
+<!-- 📌 Önizleme Alanı -->
+<img id="previewImage" src="" style="display:none; max-width:300px; margin-top:10px; border:1px solid #ccc;" />
+
+<!-- 📌 Yükleme Sonucu -->
+<p id="uploadMessage" style="color: red;"></p>
+
+<!-- 📌 JavaScript Kodu -->
+<script>
+    document.getElementById("fileInput").addEventListener("change", function () {
+        var formData = new FormData();
+        formData.append("file", this.files[0]);
+
+        fetch("/Home/Upload", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("previewImage").src = data.url;
+                document.getElementById("previewImage").style.display = "block";
+                document.getElementById("uploadMessage").innerText = "Dosya başarıyla yüklendi!";
+                document.getElementById("uploadMessage").style.color = "green";
+            } else {
+                document.getElementById("uploadMessage").innerText = data.message;
+                document.getElementById("uploadMessage").style.color = "red";
+            }
+        })
+        .catch(error => console.error("Yükleme hatası:", error));
+    });
+</script>
